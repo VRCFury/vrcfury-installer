@@ -26,7 +26,11 @@ jobs:
             ../.github/workflows/build_unitypackage.sh \
                 ../../VRCFury-installer.unitypackage \
                 Packages/com.vrcfury.installer
+      - name: set NOW
+        run: |
+          echo "::set-env name=NOW::$(date +'%Y-%m-%dT%H:%M:%S')"
       - name: Release installer
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ env.NOW }}
           files: 'VRCFury-installer.unitypackage'
