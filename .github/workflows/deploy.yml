@@ -1,0 +1,32 @@
+name: 'Deploy'
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          path: repo
+      - name: Build installer
+        uses: mikefarah/yq@v4.31.2
+        with:
+          cmd: |
+            cd repo/com.vrcfury.installer
+            chmod +x ../.github/workflows/build_unitypackage.sh
+            ../.github/workflows/build_unitypackage.sh \
+                ../../VRCFury-installer.unitypackage \
+                Packages/com.vrcfury.installer
+      - name: Release installer
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'VRCFury-installer.unitypackage'
