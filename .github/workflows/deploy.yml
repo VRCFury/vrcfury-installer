@@ -28,7 +28,7 @@ jobs:
                 Packages/com.vrcfury.installer
       - name: set NOW
         run: |
-          echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_ENV"
+          echo "NOW=$(date +'%Y-%m-%dT%H-%M-%S')" >> "$GITHUB_ENV"
       - name: Release installer
         uses: softprops/action-gh-release@v1
         with:
