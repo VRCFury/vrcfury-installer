@@ -104,7 +104,11 @@ public class VRCFuryInstaller {
 
     private static void RefreshPackages() {
         MethodInfo method = typeof(Client).GetMethod("Resolve",
-            BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+            BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
+            null,
+            new Type[] {},
+            null
+        );
         method.Invoke(null, null); 
     }
 
