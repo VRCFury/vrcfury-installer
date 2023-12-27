@@ -42,10 +42,10 @@ public class VRCFuryInstaller {
             changed |= Delete("Packages/com.vrcfury.vrcfury.tgz");
             changed |= Delete("Packages/com.vrcfury.vrcfury");
             changed |= CleanManifest(true);
-            RefreshPackages();
             return changed;
         });
         if (restarting) {
+            RefreshPackages();
             // Unity will probably unload us during this pause, but that's fine, we'll just start over.
             // We need to make sure unity has totally forgotten about com.vrcfury.vrcfury before we install
             // the new one, otherwise it will delete our new com.vrcfury.vrcfury folder when it cleans up
@@ -107,7 +107,7 @@ public class VRCFuryInstaller {
     }
 
     private static void RefreshPackages() {
-        Log("Re-resolving packages ...");
+        Log("Triggering Package Resolve ...");
         MethodInfo method = typeof(Client).GetMethod("Resolve",
             BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
             null,
