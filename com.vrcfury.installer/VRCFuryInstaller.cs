@@ -31,9 +31,11 @@ public class VRCFuryInstaller {
 
     private static async Task InstallUnsafe() {
         if (HasLocalDirectoryVrcfPackage()) {
-            Debug.LogWarning("VRCF Installer is not running, because you have a vrcfury package installed in development mode (local directory)");
+            Log("Not running, because you have a vrcfury package installed in development mode (local directory)");
             return;
         }
+        
+        Log("Starting ...");
         
         var restarting = await InMainThread(() => {
             var changed = false;
@@ -52,6 +54,7 @@ public class VRCFuryInstaller {
         }
 
         var url = "https://vrcfury.com/downloadRawZip";
+        Log("Downloading ...");
         var tempFile = await InMainThread(FileUtil.GetUniqueTempPathInProject) + ".zip";
         try {
             using (var response = await HttpClient.GetAsync(url)) {
@@ -64,6 +67,7 @@ public class VRCFuryInstaller {
             throw new Exception($"Failed to download {url}\n{e.Message}", e);
         }
 
+        Log("Extracting ...");
         var tmpDir = await InMainThread(FileUtil.GetUniqueTempPathInProject);
         using (var stream = File.OpenRead(tempFile)) {
             using (var archive = new ZipArchive(stream)) {
@@ -85,7 +89,7 @@ public class VRCFuryInstaller {
             var appRootDir = Path.GetDirectoryName(Application.dataPath);
             Directory.CreateDirectory(appRootDir + "/Temp/vrcfInstalling");
 
-            Debug.Log($"Moving {tmpDir} to Packages/com.vrcfury.vrcfury");
+            Log($"Moving {tmpDir} to Packages/com.vrcfury.vrcfury");
             Directory.Move(tmpDir, "Packages/com.vrcfury.vrcfury");
 
             CleanManifest(false);
@@ -103,6 +107,7 @@ public class VRCFuryInstaller {
     }
 
     private static void RefreshPackages() {
+        Log("Re-resolving packages ...");
         MethodInfo method = typeof(Client).GetMethod("Resolve",
             BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public,
             null,
@@ -124,7 +129,11 @@ public class VRCFuryInstaller {
         if (!File.Exists(manifestPath)) return false;
         var lines = File.ReadLines(manifestPath).ToArray();
         bool ShouldRemoveLine(string line) {
-            return line.Contains("com.vrcfury.") && (!mainOnly || line.Contains("com.vrcfury.vrcfury"));
+            var remove = line.Contains("com.vrcfury.") && (!mainOnly || line.Contains("com.vrcfury.vrcfury"));
+            if (remove) {
+                Log($"Removing manifest line: {line}");
+            }
+            return remove;
         }
         var linesToKeep = lines.Where(l => !ShouldRemoveLine(l)).ToArray();
         if (lines.Length == linesToKeep.Length) return false;
@@ -138,12 +147,12 @@ public class VRCFuryInstaller {
     private static bool Delete(string path) {
         if (string.IsNullOrWhiteSpace(path)) return false;
         if (Directory.Exists(path)) {
-            Debug.Log("Deleting directory: " + path);
+            Log("Deleting directory: " + path);
             Directory.Delete(path, true);
             return true;
         }
         if (File.Exists(path)) {
-            Debug.Log("Deleting file: " + path);
+            Log("Deleting file: " + path);
             File.Delete(path);
             return true;
         }
@@ -176,5 +185,9 @@ public class VRCFuryInstaller {
         EditorApplication.delayCall += Callback;
 
         return promise.Task;
+    }
+
+    private static void Log(string message) {
+        Debug.Log($"VRCFury Installer > {message}");
     }
 }
