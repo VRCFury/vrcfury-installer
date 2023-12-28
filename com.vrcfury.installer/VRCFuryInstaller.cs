@@ -45,7 +45,7 @@ public class VRCFuryInstaller {
             return changed;
         });
         if (restarting) {
-            RefreshPackages();
+            await InMainThread(() => { RefreshPackages(); });
             // Unity will probably unload us during this pause, but that's fine, we'll just start over.
             // We need to make sure unity has totally forgotten about com.vrcfury.vrcfury before we install
             // the new one, otherwise it will delete our new com.vrcfury.vrcfury folder when it cleans up
