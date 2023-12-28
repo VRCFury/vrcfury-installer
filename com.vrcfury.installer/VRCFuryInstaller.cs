@@ -39,8 +39,6 @@ public class VRCFuryInstaller {
         
         var restarting = await InMainThread(() => {
             var changed = false;
-            changed |= Delete("Packages/com.vrcfury.vrcfury.tgz");
-            changed |= Delete("Packages/com.vrcfury.vrcfury");
             changed |= CleanManifest(true);
             return changed;
         });
@@ -88,10 +86,7 @@ public class VRCFuryInstaller {
         await InMainThread(() => {
             var appRootDir = Path.GetDirectoryName(Application.dataPath);
             Directory.CreateDirectory(appRootDir + "/Temp/vrcfInstalling");
-
-            Log($"Moving {tmpDir} to Packages/com.vrcfury.vrcfury");
-            Directory.Move(tmpDir, "Packages/com.vrcfury.vrcfury");
-
+            
             CleanManifest(false);
             Delete(AssetDatabase.GUIDToAssetPath("00b990f230095454f82c345d433841ae"));
             Delete("Assets/VRCFury");
@@ -101,6 +96,11 @@ public class VRCFuryInstaller {
             Delete("Packages/com.vrcfury.updater.tgz");
             Delete("Packages/com.vrcfury.updater");
             Delete("Packages/com.vrcfury.installer");
+            Delete("Packages/com.vrcfury.vrcfury.tgz");
+            Delete("Packages/com.vrcfury.vrcfury");
+
+            Log($"Moving {tmpDir} to Packages/com.vrcfury.vrcfury");
+            Directory.Move(tmpDir, "Packages/com.vrcfury.vrcfury");
 
             RefreshPackages();
         });
