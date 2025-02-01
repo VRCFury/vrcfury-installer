@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "NOW=$(date +'%Y-%m-%dT%H-%M-%S')" >> "$GITHUB_ENV"
       - name: Release installer
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.NOW }}
           files: 'VRCFury-installer.unitypackage'
